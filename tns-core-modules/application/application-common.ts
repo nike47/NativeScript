@@ -1,7 +1,10 @@
 // Require globals first so that snapshot takes __extends function.
 import "../globals";
 import { Observable, EventData } from "../data/observable";
-import { View } from "../ui/core/view";
+import {
+    // CSS_CLASS_PREFIX,
+    View
+} from "../ui/core/view";
 import {
     trace as profilingTrace,
     time,
@@ -54,12 +57,11 @@ export const uncaughtErrorEvent = "uncaughtError";
 export const discardedErrorEvent = "discardedError";
 export const orientationChangedEvent = "orientationChanged";
 
-export const CSS_CLASS_PREFIX = "ns-";
-const ORIENTATION_CSS_CLASSES = [
-    `${CSS_CLASS_PREFIX}${DeviceOrientation.portrait}`,
-    `${CSS_CLASS_PREFIX}${DeviceOrientation.landscape}`,
-    `${CSS_CLASS_PREFIX}${DeviceOrientation.unknown}`
-];
+// const ORIENTATION_CSS_CLASSES = [
+//     `${CSS_CLASS_PREFIX}${DeviceOrientation.portrait}`,
+//     `${CSS_CLASS_PREFIX}${DeviceOrientation.landscape}`,
+//     `${CSS_CLASS_PREFIX}${DeviceOrientation.unknown}`
+// ];
 
 let cssFile: string = "./app.css";
 
@@ -125,14 +127,14 @@ export function loadAppCss(): void {
     }
 }
 
-export function orientationChanged(rootView: View, newOrientation: "portrait" | "landscape" | "unknown"): void {
-    const newOrientationCssClass = `${CSS_CLASS_PREFIX}${newOrientation}`;
-    if (!rootView.cssClasses.has(newOrientationCssClass)) {
-        ORIENTATION_CSS_CLASSES.forEach(c => rootView.cssClasses.delete(c));
-        rootView.cssClasses.add(newOrientationCssClass);
-        rootView._onCssStateChange();
-    }
-}
+// export function orientationChanged(rootView: View, newOrientation: "portrait" | "landscape" | "unknown"): void {
+//     const newOrientationCssClass = `${CSS_CLASS_PREFIX}${newOrientation}`;
+//     if (!rootView.cssClasses.has(newOrientationCssClass)) {
+//         ORIENTATION_CSS_CLASSES.forEach(c => rootView.cssClasses.delete(c));
+//         rootView.cssClasses.add(newOrientationCssClass);
+//         rootView._onCssStateChange();
+//     }
+// }
 
 global.__onUncaughtError = function (error: NativeScriptError) {
     events.notify(<UnhandledErrorEventData>{ eventName: uncaughtErrorEvent, object: app, android: error, ios: error, error: error });

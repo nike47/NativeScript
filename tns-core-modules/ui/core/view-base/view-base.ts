@@ -22,10 +22,15 @@ export { isIOS, isAndroid, layout, Color };
 export * from "../bindable";
 export * from "../properties";
 
+import * as dnm from "../../../debugger/dom-node";
 import * as ssm from "../../styling/style-scope";
 
-// import { DOMNode } from "../../../debugger/dom-node";
-import * as dnm from "../../../debugger/dom-node";
+const MODAL = "modal";
+const ROOT = "root";
+export const CSS_CLASS_PREFIX = "ns-";
+export const MODAL_ROOT_VIEW_CSS_CLASS = `${CSS_CLASS_PREFIX}${MODAL}`;
+export const ROOT_VIEW_CSS_CLASSES = [`${CSS_CLASS_PREFIX}${ROOT}`];
+
 let domNodeModule: typeof dnm;
 
 function ensuredomNodeModule(): void {
@@ -1036,11 +1041,23 @@ bindingContextProperty.register(ViewBase);
 export const classNameProperty = new Property<ViewBase, string>({
     name: "className",
     valueChanged(view: ViewBase, oldValue: string, newValue: string) {
-        let classes = view.cssClasses;
-        classes.clear();
-        if (typeof newValue === "string" && newValue !== "") {
-            newValue.split(" ").forEach(c => classes.add(c));
+        const cssClasses = view.cssClasses;
+
+        const shouldAddModalRootViewCssClass = cssClasses.has(MODAL_ROOT_VIEW_CSS_CLASS);
+        const shouldAddRootViewCssClasses = cssClasses.has(ROOT_VIEW_CSS_CLASSES[0]);
+
+        cssClasses.clear();
+
+        if (shouldAddModalRootViewCssClass) {
+            cssClasses.add(MODAL_ROOT_VIEW_CSS_CLASS);
+        } else if (shouldAddRootViewCssClasses) {
+            ROOT_VIEW_CSS_CLASSES.forEach(c => cssClasses.add(c));
         }
+
+        if (typeof newValue === "string" && newValue !== "") {
+            newValue.split(" ").forEach(c => cssClasses.add(c));
+        }
+
         view._onCssStateChange();
     }
 });

@@ -484,3 +484,15 @@ export const bindingContextProperty: InheritedProperty<ViewBase, any>;
  * Throws error if value is not 'true' or 'false'.
  */
 export function booleanConverter(v: string): boolean;
+
+
+/**
+ * String value "ns-" used for CSS class prefix.
+ */
+export const CSS_CLASS_PREFIX: string;
+
+/**
+ * TODO:
+ */
+export const MODAL_ROOT_VIEW_CSS_CLASS: string;
+export const ROOT_VIEW_CSS_CLASSES: string[];
