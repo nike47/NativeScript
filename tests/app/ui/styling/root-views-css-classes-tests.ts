@@ -22,6 +22,7 @@ import {
 } from "tns-core-modules/ui/core/view/view-common";
 import { DeviceType } from "tns-core-modules/ui/enums/enums";
 
+const CLASS_NAME = "class-name";
 const ROOT_CSS_CLASS = "ns-root";
 const MODAL_CSS_CLASS = "ns-modal";
 const ANDROID_PLATFORM_CSS_CLASS = "ns-android";
@@ -142,6 +143,21 @@ export function test_root_view_orientation_css_class() {
     }
 }
 
+export function test_root_view_class_name_preserve_root_css_class() {
+    const rootView = getRootView();
+    rootView.className = CLASS_NAME;
+
+    const rootViewCssClasses = rootView.cssClasses;
+    TKUnit.assertTrue(rootViewCssClasses.has(
+        ROOT_CSS_CLASS),
+        `${ROOT_CSS_CLASS} CSS class is missing`
+    );
+    TKUnit.assertTrue(rootViewCssClasses.has(
+        CLASS_NAME),
+        `${CLASS_NAME} CSS class is missing`
+    );
+}
+
 export function test_modal_root_view_modal_css_class() {
     let modalClosed = false;
 
@@ -154,6 +170,58 @@ export function test_modal_root_view_modal_css_class() {
         page.off(View.shownModallyEvent, modalPageShownModallyEventHandler);
 
         TKUnit.assertTrue(_rootModalViews[0].cssClasses.has(MODAL_CSS_CLASS));
+        args.closeCallback();
+    };
+
+    const hostNavigatedToEventHandler = function (args) {
+        const page = <Page>args.object;
+        page.off(Page.navigatedToEvent, hostNavigatedToEventHandler);
+
+        const modalPage = new Page();
+        modalPage.on(View.shownModallyEvent, modalPageShownModallyEventHandler);
+        const button = <Button>page.content;
+        const options: ShowModalOptions = {
+            context: {},
+            closeCallback: modalCloseCallback,
+            fullscreen: false,
+            animated: false
+        };
+        button.showModal(modalPage, options);
+    };
+
+    const hostPageFactory = function (): Page {
+        const hostPage = new Page();
+        hostPage.on(Page.navigatedToEvent, hostNavigatedToEventHandler);
+
+        const button = new Button();
+        hostPage.content = button;
+
+        return hostPage;
+    };
+
+    helper.navigate(hostPageFactory);
+    TKUnit.waitUntilReady(() => modalClosed);
+}
+
+export function test_modal_root_view_class_name_preserve_modal_css_class() {
+    let modalClosed = false;
+
+    const modalCloseCallback = function () {
+        modalClosed = true;
+    };
+
+    const modalPageShownModallyEventHandler = function (args: ShownModallyData) {
+        const page = <Page>args.object;
+        page.off(View.shownModallyEvent, modalPageShownModallyEventHandler);
+
+        const rootModalView = _rootModalViews[0];
+        rootModalView.className = CLASS_NAME;
+
+        const rootModalViewCssClasses = rootModalView.cssClasses;
+        TKUnit.assertTrue(rootModalViewCssClasses.has(MODAL_CSS_CLASS),
+            `${MODAL_CSS_CLASS} CSS class is missing`);
+        TKUnit.assertTrue(rootModalViewCssClasses.has(CLASS_NAME),
+            `${CLASS_NAME} CSS class is missing`);
         args.closeCallback();
     };
 
